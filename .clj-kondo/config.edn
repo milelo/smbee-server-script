@@ -1,0 +1,2 @@
+{:lint-as {promesa.core/let                  cljs.core/let
+           }}
