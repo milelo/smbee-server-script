@@ -1,0 +1,1 @@
+# smbee-server-script
