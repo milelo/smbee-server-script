@@ -22,7 +22,7 @@
       entry-re #"^([^:]*):([^:]*):([^:]*):([^:]*):([^:]*):([^:]*):([^:]*)"
       gecos-re #"^([^,]*)?\,?([^,]*)?\,?([^,]*)?\,?([^,]*)?\,?([^,]*)?"]
   (defn- parse-passwd [output]
-    (let [prase-entry (fn [entry]
+    (let [parse-entry (fn [entry]
                         (let [m (zipmap [:entry :user :pw :uid :gid :gecos :home-dir :shell] (re-find entry-re entry))
                               m (into m (map (fn [k v]
                                                (when v
@@ -30,9 +30,10 @@
                                              [:name :room-number :work-phone :home-phone :other]
                                              (rest (re-find gecos-re (:gecos m)))))]
                           m))]
-      (map prase-entry (split output \newline)))))
+      (map parse-entry (split output \newline)))))
 
 (defn list-users []
+  (println)
   (p/let [output ($ "getent passwd | grep /home/")
           ;output ($ "getent passwd")
           user-info (parse-passwd (-> output bean :stdout))]
@@ -57,14 +58,15 @@
             3 list users
             4 play
             ")
-  (p/let [option (question "select option? ")]
-    (println)
-    (case option
-      \1 (add-user)
-      \2 (load-user)
-      \3 (list-users)
-      \4 (play)
-      (println "invalid option"))))
+  (p/loop []
+    (p/let [option (question "select option? ")]
+      (case option
+        \1 (add-user)
+        \2 (load-user)
+        \3 (list-users)
+        \4 (play)
+        (do (println "invalid option\n")
+            (p/recur))))))
 
 (choose-option)
 
