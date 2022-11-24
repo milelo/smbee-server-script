@@ -13,7 +13,7 @@
    [lib.utils :as utils :refer [$]]
    [clojure.string :refer [split]]
    ["js-yaml" :as yaml]
-   ["child_process" :refer [spawn]]))
+   ["child_process" :refer [spawn exec]]))
 
 (def _args (let [parser (ArgumentParser. #js {:prog "start"
                                               :description "Start vscode-server on SMBeeFirmware"})]
@@ -65,9 +65,11 @@
           spawned (spawn "code-server");https://nodejs.org/api/child_process.html
           client-port 8080
           hostname "smbee-zero"]
-    (println "code-server:" (-> spawned bean))
+    (.on spawned "close" (fn [exit-code]
+                           (when (> exit-code 0)
+                             (println "\ncode-server terminated with code:" exit-code))))
     (println "code-server pid:" (-> spawned bean :pid))
-    (println "On the client open a terminal and enter:")
+    (println "Open a client terminal and enter:")
     (println (str "ssh -N -L " client-port ":127.0.0.1:" cs-port " " username "@" hostname))
     (println "In a client browser open:")
     (println (str "http://localhost:" client-port "/?folder=" firmware-path))))
