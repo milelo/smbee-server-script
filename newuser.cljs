@@ -1,4 +1,4 @@
-#!/usr/bin/env -S nbb
+#!/usr/bin/env -S nbb -cp "/home/smbee-admin/smbee-server-script/"
 (ns newuser
   (:require 
    ["argparse" :as argparse :refer [ArgumentParser]]
@@ -9,7 +9,7 @@
    ["zx" :as zx :refer [question]]
    ["zx$fs" :as fs]
    ["zx$os" :as os]
-   [utils :as utils :refer [$]]))
+   [lib.utils :as utils :refer [$]]))
 
 (set! (.-verbose zx/$) true)
 
@@ -22,8 +22,11 @@
 
 ;(.dir js/console args)
 
-(p/let [op ($ "sudo adduser --gecos '' --disabled-password" (:username args))
+(p/let [op ($ "adduser --gecos '' --disabled-password" (:username args))
+        op ($ "chpasswd <<<" (str username \: username));username:password
         ])
+
+
 
 
 

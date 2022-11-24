@@ -1,7 +1,7 @@
-#!/usr/bin/env -S nbb
+#!/usr/bin/env -S nbb -cp "/home/smbee-admin/smbee-server-script/"
 (ns rmuser
   (:require
-   [utils :refer [$]]
+   [lib.utils :refer [$]]
    [cljs-bean.core :refer [bean ->clj ->js]]
    ["argparse" :as argparse :refer [ArgumentParser]]))
 
