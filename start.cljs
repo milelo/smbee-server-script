@@ -64,14 +64,14 @@
           {:keys [username]} (->clj (os/userInfo))
           spawned (spawn "code-server");https://nodejs.org/api/child_process.html
           client-port 8080
-          hostname "smbee-zero"]
-    (.on spawned "close" (fn [exit-code]
+          hostname "smbee-zero.local"]
+    (.on spawned "exit" (fn [exit-code]
                            (when (> exit-code 0)
                              (println "\ncode-server terminated with code:" exit-code))))
     (println "code-server pid:" (-> spawned bean :pid))
-    (println "Open a client terminal and enter:")
+    (println "\nOpen a client terminal and enter:")
     (println (str "ssh -N -L " client-port ":127.0.0.1:" cs-port " " username "@" hostname))
-    (println "In a client browser open:")
+    (println "\nIn a client browser open:")
     (println (str "http://localhost:" client-port "/?folder=" firmware-path))))
 
 (main)
