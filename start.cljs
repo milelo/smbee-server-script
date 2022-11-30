@@ -5,7 +5,7 @@
    [cljs-bean.core :refer [bean ->clj ->js]];https://github.com/mfikes/cljs-bean
    [promesa.core :as p]
    ;[clojure.pprint :refer [cl-format]]
-   ;["zx" :as zx]
+   ["zx" :as zx]
    ["zx$path" :as path]
    ["zx$fs" :as fs]
    ["zx$os" :as os]
@@ -46,8 +46,19 @@
                                    :cert false})]
     new-yaml))
 
+(set! (.-verbose zx/$) false)
+
 (defn main []
-  (p/let [firmware-path (path/join (os/homedir) "SMBeeFirmware")
+  (p/let [{:keys [username]} (->clj (os/userInfo))
+          ;Ensure users account has full-name set:
+          pwe ($ "getent passwd" username)
+          {:keys [full-name]} (-> pwe str utils/parse-passwd-entry)
+          _ (set! (.-verbose zx/$) true);Must enable to receive password prompt
+          full-name (or (not-empty full-name)
+                        (p/let [fname (zx/question "Your full name? ")
+                                _ ($ "chfn -f" fname)]
+                          fname))
+          firmware-path (path/join (os/homedir) "SMBeeFirmware")
           firmware-dir? (fs/pathExists firmware-path)
           _ (when-not firmware-dir?
               ($ "git clone https://github.com/milelo/SMBeeFirmware.git" firmware-path))
@@ -61,13 +72,13 @@
                 (fs/ensureFileSync config-path)
                 (fs/writeFileSync config-path yaml)))
           cs-port (or cs-port (get-cs-port config-path))
-          {:keys [username]} (->clj (os/userInfo))
           spawned (spawn "code-server");https://nodejs.org/api/child_process.html
           client-port 8080
           hostname "smbee-zero.local"]
     (.on spawned "exit" (fn [exit-code]
-                           (when (> exit-code 0)
-                             (println "\ncode-server terminated with code:" exit-code))))
+                          (when (> exit-code 0)
+                            (println "\ncode-server terminated with code:" exit-code))))
+    (println "Hello" full-name)
     (println "code-server pid:" (-> spawned bean :pid))
     (println "\nOpen a client terminal and enter:")
     (println (str "ssh -N -L " client-port ":127.0.0.1:" cs-port " " username "@" hostname))
