@@ -52,7 +52,7 @@
   (p/let [{:keys [username]} (->clj (os/userInfo))
           ;Ensure users account has full-name set:
           pwe ($ "getent passwd" username)
-          {:keys [full-name]} (-> pwe str utils/parse-passwd-entry)
+          {:keys [full-name]} (-> pwe str utils/parse-passwd)
           _ (set! (.-verbose zx/$) true);Must enable to receive password prompt
           full-name (or (not-empty full-name)
                         (p/let [fname (zx/question "Your full name? ")
@@ -79,8 +79,9 @@
                           (when (> exit-code 0)
                             (println "\ncode-server terminated with code:" exit-code))))
     (println "Hello" full-name)
-    (println "code-server pid:" (-> spawned bean :pid))
+    (println "Starting code-server; pid:" (-> spawned bean :pid))
     (println "\nOpen a client terminal and enter:")
+    ;see https://coder.com/docs/code-server/latest/guide
     (println (str "ssh -N -L " client-port ":127.0.0.1:" cs-port " " username "@" hostname))
     (println "\nIn a client browser open:")
     (println (str "http://localhost:" client-port "/?folder=" firmware-path))))

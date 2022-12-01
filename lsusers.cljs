@@ -16,14 +16,14 @@
                                              :description "list users"})]
             (bean (.parse_args parser (->js (vec *command-line-args*))))))
 
-(defn- parse-passwd [output]
-  (map utils/parse-passwd-entry (split output \newline)))
+(defn- parse-passwds [output]
+  (map utils/parse-passwd (split output \newline)))
 
 (defn list-users []
   (println)
   (p/let [output ($ "getent passwd | grep /home/")
           ;output ($ "getent passwd")
-          user-info (-> output str parse-passwd)]
+          user-info (-> output str parse-passwds)]
     (doseq [{:keys [user full-name] :as _e} user-info]
       ;(pprint _e)
       (println (if full-name
