@@ -1,0 +1,8 @@
+{
+  "files.associations": {
+    "start": "clojure",
+    "newuser": "clojure",
+    "rmuser": "clojure",
+    "lsusers": "clojure",
+  }
+}
