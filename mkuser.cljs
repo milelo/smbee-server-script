@@ -1,6 +1,6 @@
 #!/usr/bin/env -S nbb -cp "/home/smbee-admin/smbee-server-script/"
-(ns newuser
-  (:require 
+(ns mkuser
+  (:require
    ["argparse" :as argparse :refer [ArgumentParser]]
    [clojure.pprint :refer [pprint]]
    [cljs-bean.core :refer [bean ->clj ->js]];https://github.com/mfikes/cljs-bean
@@ -9,6 +9,7 @@
    ["zx" :as zx :refer [question]]
    ["zx$fs" :as fs]
    ["zx$os" :as os]
+   ["zx$path" :as path]
    [lib.utils :as utils :refer [$]]))
 
 (set! (.-verbose zx/$) true)
@@ -22,8 +23,13 @@
 
 ;(.dir js/console args)
 
-(p/let [op ($ "adduser --gecos '' --disabled-password" (:username args))
-        op ($ "chpasswd <<<" (str username \: username));username:password
+(p/let [_ ($ "adduser --gecos '' --disabled-password" (:username args))
+        _ ($ "chpasswd <<<" (str username \: username));username:password
+        firmware-path (path/join "/home/" username "/SMBeeFirmware")
+        firmware-dir? (fs/pathExists firmware-path)
+        _ (when-not firmware-dir?
+            ($ "git clone https://github.com/milelo/SMBeeFirmware.git" firmware-path))
+          ;
         ])
 
 
