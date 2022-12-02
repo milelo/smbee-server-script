@@ -14,9 +14,9 @@
 
 (set! (.-verbose zx/$) true)
 
-(def args (let [parser (ArgumentParser. #js {:prog "nbb newuser.cljs"
+(def args (let [parser (ArgumentParser. #js {:prog "sudo mkuser"
                                              :description "Add a new user"})]
-            (.add_argument parser "username" #js {:help "new user name"})
+            (.add_argument parser "username" #js {:help "New-users name"})
             (bean (.parse_args parser (->js (vec *command-line-args*))))))
 
 (def username (:username args))
