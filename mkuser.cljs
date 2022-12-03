@@ -28,7 +28,9 @@
         firmware-path (path/join "/home/" username "/SMBeeFirmware")
         firmware-dir? (fs/pathExists firmware-path)
         _ (when-not firmware-dir?
-            ($ "git clone https://github.com/milelo/SMBeeFirmware.git" firmware-path))
+            (p/let [_ ($ "git clone https://github.com/milelo/SMBeeFirmware.git" firmware-path)
+                    _ ($ 'chown '-R username firmware-path) 
+                    _ ($ 'chgrp '-R username firmware-path)]))
           ;
         ])
 
